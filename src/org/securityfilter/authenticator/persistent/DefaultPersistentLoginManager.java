@@ -61,6 +61,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.*;
 import java.io.*;
 import java.security.*;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * <code>DefaultPersistentLoginManager</code> manages the saving and retrieving of the
@@ -499,7 +500,7 @@ public class DefaultPersistentLoginManager implements Serializable, PersistentLo
     * @return clearText, encrypted
     */
    private String encryptText(String clearText) {
-      sun.misc.BASE64Encoder encoder = new sun.misc.BASE64Encoder();
+      Base64 encoder = new Base64();
       try {
          Cipher c1 = Cipher.getInstance(cipherParameters);
          if (secretKey != null) {
@@ -507,7 +508,7 @@ public class DefaultPersistentLoginManager implements Serializable, PersistentLo
             byte clearTextBytes[];
             clearTextBytes = clearText.getBytes();
             byte encryptedText[] = c1.doFinal(clearTextBytes);
-            String encryptedEncodedText = encoder.encode(encryptedText);
+            String encryptedEncodedText = new String(encoder.encode(encryptedText), "US-ASCII");
             return encryptedEncodedText;
          } else {
             System.out.println("ERROR! >> SecretKey not generated ....");
@@ -528,9 +529,9 @@ public class DefaultPersistentLoginManager implements Serializable, PersistentLo
     * @return encryptedText, decrypted
     */
    private String decryptText(String encryptedText) {
-      sun.misc.BASE64Decoder decoder = new sun.misc.BASE64Decoder();
+      Base64 decoder = new Base64();
       try {
-         byte decodedEncryptedText[] = decoder.decodeBuffer(encryptedText);
+         byte decodedEncryptedText[] = decoder.decode(encryptedText.getBytes("US-ASCII"));
          Cipher c1 = Cipher.getInstance(cipherParameters);
          c1.init(c1.DECRYPT_MODE, secretKey);
          byte[] decryptedText = c1.doFinal(decodedEncryptedText);

@@ -92,6 +92,8 @@ public class AuthenticatorFactory {
       } else if (HttpServletRequest.BASIC_AUTH.equals(authMethod)) {
          // BASIC
          authenticator = new BasicAuthenticator();
+      } else if("FORM_COOKIE_TOKEN".equals(authMethod)) {
+          authenticator = new FormDomainCookieTokenAuthenticator();
       } else {
          throw new Exception("No Authenticator available for auth method: " + authMethod);
       }

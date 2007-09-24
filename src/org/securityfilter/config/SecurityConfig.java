@@ -87,6 +87,12 @@ public class SecurityConfig {
    private boolean validating;
    private String authMethod;
    private String realmName;
+   private boolean setCookies = false;
+   private boolean acceptCookie = false;
+   private String extraHashString = null;
+   private String secretKey;
+   private String cookiePaths;
+   private int cookieExpire;
 
    /**
     * Constructor that takes the validating flag and debug level to be used while parsing.
@@ -234,6 +240,81 @@ public class SecurityConfig {
          lastRealm = realm;
       }
    }
+   
+   public boolean isSetCookies() {
+       return this.setCookies;
+   }
+   
+   public void setSetCookies(String setCookies) {
+       this.setCookies = "true".equalsIgnoreCase(setCookies);
+   }
+   
+   public boolean isAcceptCookie() {
+       return this.acceptCookie;
+   }
+   
+   public void setAcceptCookie(String acceptCookie) {
+       this.acceptCookie = "true".equalsIgnoreCase(acceptCookie);
+   }
+   
+   /**
+    * Return the secret key for encrypting the authentication token cookie.
+    * Format: 8 bytes hex (16 characters).
+    */
+   public String getSecretKey() {
+      return this.secretKey;
+   }
+
+   /**
+    * Set secret key. Must be 8 bytes (16 hex characters).
+    */
+   public void setSecretKey(String secretKey) {
+      this.secretKey = secretKey;
+   }   
+   
+   /**
+    * Return the extra hash string for adding salt to the validation hash
+    */
+   public String getExtraHashString() {
+      return this.extraHashString;
+   }
+
+   /**
+    * Set extra hash string
+    */
+   public void setExtraHashString(String extraHashString) {
+      this.extraHashString = extraHashString;
+   }   
+
+   /**
+    * Return the paths for which authentication token cookies should be set.
+    * Semicolon-separated list of paths.
+    */
+   public String getCookiePaths() {
+      return this.cookiePaths;
+   }
+
+   /**
+    * Set cookie paths.
+    */
+   public void setCookiePaths(String cookiePaths) {
+      this.cookiePaths = cookiePaths;
+   }   
+
+   /**
+    * Return the amount of seconds the authentication token cookie should remain
+    * valid after logging in (in seconds).
+    */
+   public int getCookieExpire() {
+      return this.cookieExpire;
+   }
+
+   /**
+    * Set cookie validity duration in seconds.
+    */
+   public void setCookieExpire(String cookieExpire) {
+      this.cookieExpire = Integer.parseInt(cookieExpire);
+   }   
 
    /**
     * Return the configured SecurityConstraints.
@@ -323,6 +404,14 @@ public class SecurityConfig {
          "setPersistentLoginManager",
          "org.securityfilter.authenticator.persistent.PersistentLoginManagerInterface"
       );
+      
+      // cookie auth token
+      digester.addCallMethod("securityfilter-config/login-config/cookie-auth-token-config/set-cookies", "setSetCookies", 0);
+      digester.addCallMethod("securityfilter-config/login-config/cookie-auth-token-config/accept-cookie", "setAcceptCookie", 0);
+      digester.addCallMethod("securityfilter-config/login-config/cookie-auth-token-config/secret-key", "setSecretKey", 0);
+      digester.addCallMethod("securityfilter-config/login-config/cookie-auth-token-config/extra-hash-string", "setExtraHashString", 0);
+      digester.addCallMethod("securityfilter-config/login-config/cookie-auth-token-config/cookie-paths", "setCookiePaths", 0);
+      digester.addCallMethod("securityfilter-config/login-config/cookie-auth-token-config/cookie-expire", "setCookieExpire", 0);
 
       // security-constraint
       digester.addObjectCreate(
@@ -374,6 +463,7 @@ public class SecurityConfig {
 
       InputSource input = new InputSource(configURL.openStream());
       digester.parse(input);
+      
    }
 
    /**

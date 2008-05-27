@@ -94,6 +94,14 @@ public class AuthenticatorFactory {
          authenticator = new BasicAuthenticator();
       } else if("FORM_COOKIE_TOKEN".equals(authMethod)) {
           authenticator = new FormDomainCookieTokenAuthenticator();
+      } else if("ASELECTFILTER".equals(authMethod)) {
+          /* maak deze Authenticator met loadClass() omdat deze in 
+           * b3p-commons-core project zit maar dat kan geen reference van dit 
+           * project zijn omdat dat project securityfilter-b3p al als reference 
+           * heeft
+           */
+          Class clazz = Class.forName("nl.b3p.commons.security.aselect.ASelectFilterAuthenticator");
+          authenticator = (Authenticator)clazz.newInstance();
       } else {
          throw new Exception("No Authenticator available for auth method: " + authMethod);
       }

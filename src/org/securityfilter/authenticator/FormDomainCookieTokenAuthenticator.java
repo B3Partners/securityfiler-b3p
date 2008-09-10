@@ -8,8 +8,7 @@ import java.io.IOException;
 import java.security.Principal;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.DESKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.FilterConfig;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -38,9 +37,7 @@ public class FormDomainCookieTokenAuthenticator extends FormAuthenticator {
     protected final static String COOKIE_NAME = "AuthToken";
     protected final static String CHARSET = "US-ASCII";
 
-    protected final static String encryptionAlgorithm = "DES";
-    protected final static String encryptionMode = "ECB";
-    protected final static String encryptionPadding = "PKCS5Padding";
+    protected final static String encryptionAlgorithm = "AES";
 
     /**
      * Key waarmee het cookie wordt encrypt/decrypt.
@@ -87,6 +84,7 @@ public class FormDomainCookieTokenAuthenticator extends FormAuthenticator {
         }
 
         String secretKeyHex = securityConfig.getSecretKey();
+        log.info("secrey key hex length: " + secretKeyHex.length());
         setEncryptionKey(new Hex().decode(secretKeyHex.getBytes(CHARSET)));
 
         extraHashString = securityConfig.getExtraHashString();
@@ -275,7 +273,7 @@ public class FormDomainCookieTokenAuthenticator extends FormAuthenticator {
     }
 
     private String getCipherParameters() {
-        return encryptionAlgorithm + "/" + encryptionMode + "/" + encryptionPadding;
+        return encryptionAlgorithm;
     }
 
    /**
@@ -287,7 +285,7 @@ public class FormDomainCookieTokenAuthenticator extends FormAuthenticator {
     private String encryptText(String clearText, String cipherParameters, SecretKey secretKey, String charset) throws Exception {
         Base64 encoder = new Base64();
         Cipher c1 = Cipher.getInstance(cipherParameters);
-        c1.init(c1.ENCRYPT_MODE, secretKey);
+        c1.init(Cipher.ENCRYPT_MODE, secretKey);
         byte clearTextBytes[];
         clearTextBytes = clearText.getBytes();
         byte encryptedText[] = c1.doFinal(clearTextBytes);
@@ -305,7 +303,7 @@ public class FormDomainCookieTokenAuthenticator extends FormAuthenticator {
         Base64 decoder = new Base64();
         byte decodedEncryptedText[] = decoder.decode(encryptedText.getBytes(charset));
         Cipher c1 = Cipher.getInstance(cipherParameters);
-        c1.init(c1.DECRYPT_MODE, secretKey);
+        c1.init(Cipher.DECRYPT_MODE, secretKey);
         byte[] decryptedText = c1.doFinal(decodedEncryptedText);
         String decryptedTextString = new String(decryptedText);
         return decryptedTextString;
@@ -348,8 +346,6 @@ public class FormDomainCookieTokenAuthenticator extends FormAuthenticator {
     }
 
     private void setEncryptionKey(byte[] encryptionkey) throws Exception {
-        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(encryptionAlgorithm);
-        DESKeySpec desKeySpec = new DESKeySpec(encryptionkey);
-        secretKey = keyFactory.generateSecret(desKeySpec);
+        secretKey = new SecretKeySpec(encryptionkey, encryptionAlgorithm);    
     }
 }

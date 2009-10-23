@@ -11,5 +11,5 @@ public interface ExternalAuthenticatedRealm {
      * Get user that has been authenticated by external means (auth token cookie,
      * single sign on)
      */
-    public Principal getAuthenticatedPrincipal(String username);   
+    public Principal getAuthenticatedPrincipal(String username, String password);
 }

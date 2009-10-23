@@ -201,6 +201,8 @@ public class FormDomainCookieTokenAuthenticator extends FormAuthenticator {
 
     private void setAuthTokenCookies(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String username = request.getParameter(FORM_USERNAME);
+        String password = request.getParameter(FORM_PASSWORD);
+        
         if(log.isDebugEnabled()) {
         	log.debug("set AuthToken cookie(s) for user: " + username);
 		}
@@ -211,19 +213,25 @@ public class FormDomainCookieTokenAuthenticator extends FormAuthenticator {
             /* De inhoud van het cookie is het path (om te checken met het path
              * van het cookie in het request, zodat niet door het veranderen
              * van het path iemand op een webapp kan inloggen terwijl dat niet
-             * bedoeld is), username, geldigheidsduur en huidige tijd
+             * bedoeld is), username, password,  geldigheidsduur en huidige tijd
              * (om geldigheidsduur van het token te controleren).
              */
-            /* XXX evt ook handig om password hierin te stoppen? */
-            String value = System.currentTimeMillis() + ";" + cookieExpire + ";" + username + ";" + path;
+            
+            String value = System.currentTimeMillis() 
+                    + ";" + cookieExpire
+                    + ";" + username
+                    + ";" + password
+                    + ";" + path;
 
             /* Voeg een extra waarde toe zodat met behulp van een hash de
              * geldigheid kan worden gecontroleerd.
              */
             value = value + ";" + DigestUtils.shaHex((value + ";" + extraHashString).getBytes(CHARSET));
 
-            value = encryptText(value, getCipherParameters(), secretKey, CHARSET);
-            Cookie token = new Cookie(COOKIE_NAME, value);
+            String encryptedValue = encryptText(value, getCipherParameters(), secretKey, CHARSET);
+            log.debug("settting auth token cookie value (len=" + value.length() + "): " + value + " - encrypted: (len=" + encryptedValue.length() + "): " + encryptedValue);
+
+            Cookie token = new Cookie(COOKIE_NAME, encryptedValue);
             token.setPath(path);
             token.setMaxAge(cookieExpire);
             response.addCookie(token);
@@ -237,7 +245,7 @@ public class FormDomainCookieTokenAuthenticator extends FormAuthenticator {
         value = decryptText(value, getCipherParameters(), secretKey, CHARSET);
 
         String[] fields = value.split(";");
-        if(fields.length != 5) {
+        if(fields.length != 6) {
             log.warn("invalid auth token cookie (invalid field count: " + fields.length + ")");
             return null;
         }
@@ -251,15 +259,16 @@ public class FormDomainCookieTokenAuthenticator extends FormAuthenticator {
             return null;
         }
         String username = fields[2];
-        String path = fields[3];
-        String hash = fields[4];
+        String password = fields[3];
+        String path = fields[4];
+        String hash = fields[5];
 
         if(!request.getContextPath().equals(path)) {
             log.warn("auth token cookie path invalid: " + path);
             return null;
         }
 
-        String hashInput = cookieSetTime + ";" + cookieExpire + ";" + username + ";" + path + ";" + extraHashString;
+        String hashInput = cookieSetTime + ";" + cookieExpire + ";" + username + ";" + password + ";" + path + ";" + extraHashString;
         String hashed = DigestUtils.shaHex(hashInput.getBytes(CHARSET));
 
         if(!hashed.equals(hash)) {
@@ -269,7 +278,7 @@ public class FormDomainCookieTokenAuthenticator extends FormAuthenticator {
 
         log.info("accepting auth token cookie for user " + username);
 
-        return ((ExternalAuthenticatedRealm)realm).getAuthenticatedPrincipal(username);
+        return ((ExternalAuthenticatedRealm)realm).getAuthenticatedPrincipal(username, password);
     }
 
     private String getCipherParameters() {

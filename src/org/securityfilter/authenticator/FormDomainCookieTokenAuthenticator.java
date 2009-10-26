@@ -142,24 +142,32 @@ public class FormDomainCookieTokenAuthenticator extends FormAuthenticator {
          * Dit stukje code lijkt erg op het eerste stuk in de super-methode
          * welke persistant login checked.
          */
-        if(acceptCookie && request.getRemoteUser() == null) {
-            Cookie[] cookies = request.getCookies();
-            if(cookies != null) {
-                for(int i = 0; i < cookies.length; i++) {
-                    if(COOKIE_NAME.equals(cookies[i].getName())) {
-                        Principal authTokenPrincipal = getAuthTokenPrincipal(request, cookies[i]);
-                        if(authTokenPrincipal != null) {
-                            request.setUserPrincipal(authTokenPrincipal);
-                            request.getSession().setAttribute(AUTHORIZED_BY_AUTH_TOKEN, Boolean.TRUE);
-                            log.info("user " + request.getRemoteUser() + " logged in by auth token cookie (" + cookies[i].getValue() + ")");
+
+        boolean loggedInByToken = false;
+
+        if(acceptCookie) {
+            if(Boolean.TRUE.equals(request.getSession().getAttribute(AUTHORIZED_BY_AUTH_TOKEN))) {
+                loggedInByToken = true;
+            } else if(request.getRemoteUser() == null) {
+                Cookie[] cookies = request.getCookies();
+                if(cookies != null) {
+                    for(int i = 0; i < cookies.length; i++) {
+                        if(COOKIE_NAME.equals(cookies[i].getName())) {
+                            Principal authTokenPrincipal = getAuthTokenPrincipal(request, cookies[i]);
+                            if(authTokenPrincipal != null) {
+                                request.setUserPrincipal(authTokenPrincipal);
+                                request.getSession().setAttribute(AUTHORIZED_BY_AUTH_TOKEN, Boolean.TRUE);
+                                log.info("user " + request.getRemoteUser() + " logged in by auth token cookie (" + cookies[i].getValue() + ")");
+                                loggedInByToken = true;
+                            }
+                            break;
                         }
-                        break;
                     }
                 }
             }
         }
 
-        if(!setCookies) {
+        if(!setCookies || loggedInByToken) {
             /* geen speciale processing, roep alleen super-methode aan */
             return super.processLogin(request, response);
         } else {

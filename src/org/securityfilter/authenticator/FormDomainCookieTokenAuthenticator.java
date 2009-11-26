@@ -237,6 +237,10 @@ public class FormDomainCookieTokenAuthenticator extends FormAuthenticator {
             value = value + ";" + DigestUtils.shaHex((value + ";" + extraHashString).getBytes(CHARSET));
 
             String encryptedValue = encryptText(value, getCipherParameters(), secretKey, CHARSET);
+            /* Verwijder eventuele \r\n karakters die door Commons-Codec 1.4
+             * zijn toegevoegd. Deze zijn niet toegestaan in een cookie.
+             */
+            encryptedValue = encryptedValue.replaceAll("[\r\n]", "");
             log.debug("settting auth token cookie value (len=" + value.length() + "): " + value + " - encrypted: (len=" + encryptedValue.length() + "): " + encryptedValue);
 
             Cookie token = new Cookie(COOKIE_NAME, encryptedValue);

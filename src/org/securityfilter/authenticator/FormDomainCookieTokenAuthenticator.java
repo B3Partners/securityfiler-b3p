@@ -254,7 +254,13 @@ public class FormDomainCookieTokenAuthenticator extends FormAuthenticator {
         String value = authToken.getValue();
 
         /* Decrypt cookie */
-        value = decryptText(value, getCipherParameters(), secretKey, CHARSET);
+        try {
+            value = decryptText(value, getCipherParameters(), secretKey, CHARSET);
+        } catch(Exception e) {
+            log.info("Not accepting auth token cookie because of exception during decryption: " + e.getClass() + ": " + e.getMessage());;
+            log.debug("Exception decrypting auth token cookie", e);
+            return null;
+        }
 
         String[] fields = value.split(";");
         if(fields.length != 6) {

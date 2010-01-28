@@ -89,6 +89,8 @@ public class AuthenticatorFactory {
       if (HttpServletRequest.FORM_AUTH.equals(authMethod)) {
          // FORM
          authenticator = new FormAuthenticator();
+      } else if("EXTENDED_FORM".equals(authMethod)) {
+          authenticator = new ExtendedFormAuthenticator();
       } else if (HttpServletRequest.BASIC_AUTH.equals(authMethod)) {
          // BASIC
          authenticator = new BasicAuthenticator();

@@ -286,7 +286,7 @@ public class FormAuthenticator implements Authenticator {
     * @return true if the logout page is defined and the request URL matches it
     * @throws Exception
     */
-   private boolean matchesLogoutPattern(String requestURL, URLPatternMatcher patternMatcher) throws Exception {
+   protected boolean matchesLogoutPattern(String requestURL, URLPatternMatcher patternMatcher) throws Exception {
       if (logoutPagePattern != null) {
          return patternMatcher.match(requestURL, logoutPagePattern);
       }
@@ -300,7 +300,7 @@ public class FormAuthenticator implements Authenticator {
     * @param request
     * @return a URL to send the user to after logging in
     */
-   private String getContinueToURL(HttpServletRequest request) {
+   protected String getContinueToURL(HttpServletRequest request) {
       String savedURL = SecurityFilter.getContinueToURL(request);
       if (savedURL != null) {
          return savedURL;
@@ -315,7 +315,7 @@ public class FormAuthenticator implements Authenticator {
     * @param uri
     * @return uri with query string removed (if it had one)
     */
-   private String stripQueryString(String uri) {
+   protected String stripQueryString(String uri) {
       if (uri != null) {
          int queryStart = uri.indexOf('?');
          if (queryStart != -1) {

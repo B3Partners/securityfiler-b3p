@@ -104,7 +104,9 @@ public class AuthenticatorFactory {
            */
           Class clazz = Class.forName("nl.b3p.commons.security.aselect.ASelectFilterAuthenticator");
           authenticator = (Authenticator)clazz.newInstance();
-      } else {
+      } else if("COOKIE_WITH_ID".equals(authMethod)){
+          authenticator = new CookieAuthenticator();
+      } else{
          throw new Exception("No Authenticator available for auth method: " + authMethod);
       }
       authenticator.init(filterConfig, securityConfig);

@@ -56,6 +56,11 @@ public class ExtendedFormAuthenticator extends FormAuthenticator {
                 }
                 // login successful
 
+                // Get saved URL from session before an old session is invalidated
+                // This allows an application to show a login form for re-login to
+                // an account with more privileges and returning to a saved url after login
+                String continueToURL = getContinueToURL(request);
+
                 // invalidate old session if the user was already authenticated, and they logged in as a different user
                 if (request.getUserPrincipal() != null
                         && false == request.getUserPrincipal().equals(principal)) {
@@ -78,7 +83,6 @@ public class ExtendedFormAuthenticator extends FormAuthenticator {
                 }
 
                 request.setUserPrincipal(principal);
-                String continueToURL = getContinueToURL(request);
                 // This is the url that the user was initially accessing before being prompted for login.
                 response.sendRedirect(response.encodeRedirectURL(continueToURL));
             } catch (Exception e) {

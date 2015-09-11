@@ -9,12 +9,6 @@
     <properties>
         <project.build.sourceEncoding>windows-1252</project.build.sourceEncoding>
     </properties>
-    <scm>
-        <connection>scm:git:git@github.com:B3Partners/securityfilter-b3p.git</connection>
-        <developerConnection>scm:git:git@github.com:B3Partners/securityfilter-b3p.git</developerConnection>
-        <url>https://github.com/B3Partners/securityfilter-b3p</url>
-      <tag>securityfilter-b3p-4.2.1</tag>
-  </scm>
     <dependencies>
         <dependency>
             <groupId>commons-codec</groupId>
@@ -32,6 +26,12 @@
             <version>2.0.8</version>
         </dependency>
     </dependencies>
+    <scm>
+        <connection>scm:git:git@github.com:B3Partners/securityfilter-b3p.git</connection>
+        <developerConnection>scm:git:git@github.com:B3Partners/securityfilter-b3p.git</developerConnection>
+        <url>https://github.com/B3Partners/securityfilter-b3p</url>
+      <tag>securityfilter-b3p-4.2.1</tag>
+    </scm>
     <distributionManagement>
         <repository>
             <id>repo.b3p.nl</id>

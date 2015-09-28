@@ -30,7 +30,7 @@
         <connection>scm:git:git@github.com:B3Partners/securityfilter-b3p.git</connection>
         <developerConnection>scm:git:git@github.com:B3Partners/securityfilter-b3p.git</developerConnection>
         <url>https://github.com/B3Partners/securityfilter-b3p</url>
-      <tag>securityfilter-b3p-4.2.1</tag>
+      <tag>securityfilter-b3p-${project.version}</tag>
     </scm>
     <distributionManagement>
         <repository>

@@ -1,0 +1,6 @@
+org.securityfilter.authenticator
+org.securityfilter.authenticator.persistent
+org.securityfilter.config
+org.securityfilter.filter
+org.securityfilter.realm
+org.securityfilter.servlet

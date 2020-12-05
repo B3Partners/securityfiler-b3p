@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>nl.b3p</groupId>
     <artifactId>securityfilter-b3p</artifactId>
-    <version>5.0.1-SNAPSHOT</version>
+    <version>5.0.1</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceVersion>1.8</project.build.sourceVersion>
@@ -50,7 +50,7 @@
         <connection>scm:git:git@github.com:B3Partners/securityfilter-b3p.git</connection>
         <developerConnection>scm:git:git@github.com:B3Partners/securityfilter-b3p.git</developerConnection>
         <url>https://github.com/B3Partners/securityfilter-b3p</url>
-        <tag>HEAD</tag>
+        <tag>securityfilter-b3p-5.0.1</tag>
     </scm>
     <distributionManagement>
         <repository>
